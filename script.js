@@ -40,20 +40,22 @@
       image: "images/pola.jpg",
       alt: "Pola i trawy"
     },
+    
     "rzeszow": {
       title: "Rzeszów",
-      kicker: "",
-      description: "",
+      kicker: "MIASTO · PODKARPACIE",
+      description: "Rzeszów, stolica Podkarpacia, jest punktem odniesienia dla południowo-wschodniej Polski. To miejsce pozwala zastanowić się nad tym, jak lokalna kultura, krajobraz i pamięć kształtują nasze skojarzenia z kolorem.",
       image: "images/rzeszow.jpg",
-      alt: "Rzeszów"
+      alt: "Rzeszów — miejsce na mapie inspiracji"
     },
     "boleslawiec": {
       title: "Bolesławiec",
-      kicker: "",
-      description: "",
-      image: "images/boleslawiec.jpg",
-      alt: "Bolesławiec"
+      kicker: "CERAMIKA · TRADYCJA",
+      description: "Bolesławiec słynie z ceramiki zdobionej charakterystycznymi wzorami. Kolory i motywy na naczyniach łączą tradycję rzemiosła z indywidualną interpretacją. To przykład tego, jak miejsce może być rozpoznawane przez swoje barwy i formy.",
+      image: "images/boleslawiec-folk.jpg",
+      alt: "Ceramika inspirowana tradycją Bolesławca"
     }
+
   };
 
   const mapPoints = [...document.querySelectorAll(".map-point")];
