@@ -6,7 +6,7 @@
       title: "Kraków",
       kicker: "MAMA",
       description: "To skąd moja mama. Nigdy nie zapomne rój gołębi przy sukiennicach, walczące o jakąś wszelką cząsteczke obważanka. Ale to tak w nawisie mówiąc, bo główna atrakcja to atmosfera jakby z innego wieku."
-      image: "images/krakow-folk.jpg"
+      image: "images/boleslawiec-folk.jpg"
     },
     rzeszow: {
       title: "Rzeszów",
