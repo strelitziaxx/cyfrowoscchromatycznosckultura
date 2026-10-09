@@ -1,23 +1,26 @@
 (() => {
   "use strict";
+
   const $ = (id) => document.getElementById(id);
+  const root = document.documentElement;
+
   const places = {
     krakow: {
       title: "Kraków",
       kicker: "MAMA",
-      description: "To skąd moja mama. Nigdy nie zapomne rój gołębi przy sukiennicach, walczące o jakąś wszelką cząsteczke obważanka. Ale to tak w nawisie mówiąc, bo główna atrakcja to atmosfera jakby z innego wieku.",
-      image: "images/boleslawiec-folk.jpg"
+      description: "To skąd moja mama. Nigdy nie zapomnę rojów gołębi przy Sukiennicach, walczących o okruszki obwarzanka. Ale to tak na marginesie — najważniejsza jest atmosfera jakby z innego wieku.",
+      image: "images/krakow-folk.jpg"
     },
     rzeszow: {
       title: "Rzeszów",
       kicker: "TATA",
       description: "A stąd mój tata.",
-      image: "images/krakow-folk.jpg"
+      image: "images/rzeszow-folk.jpg"
     },
     boleslawiec: {
       title: "Bolesławiec",
       kicker: "CERAMIKA LUDOWA",
-      description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory, które spotkałam w sklepach nawet poza Polską, to moja inspiracja dla badania koloru.",
+      description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory, które spotkałam w sklepach nawet poza Polską, inspirują mnie do badania koloru.",
       image: "images/boleslawiec-folk.jpg"
     },
     warszawa: {
@@ -27,149 +30,48 @@
       image: "images/warszawa-folk.jpg"
     }
   };
+
   const mapPoints = [...document.querySelectorAll(".map-point")];
-  function selectPlace(id) {
-  const place = places[id];
-  if (!place) return;
-
-  $("place-title").textContent = place.title;
-  $("place-kicker").textContent = place.kicker;
-  $("place-description").textContent = place.description;
-
-  mapPoints.forEach(point => {
-    const active = point.dataset.place === id;
-    point.classList.toggle("active", active);
-    point.setAttribute("aria-pressed", String(active));
-  });
-
   const artwork = $("place-artwork");
-  if (!artwork || !place.image) return;
 
-  const applyTheme = () => {
-    try {
-      updateThemeFromImage(artwork);
-    } catch (error) {
-      console.error("Theme update failed:", error);
-    }
-  };
+  function selectPlace(id) {
+    const place = places[id];
+    if (!place) return;
 
-  if (artwork.dataset.currentImage === place.image &&
-      artwork.complete && artwork.naturalWidth) {
-    applyTheme();
-    return;
+    $("place-title").textContent = place.title;
+    $("place-kicker").textContent = place.kicker;
+    $("place-description").textContent = place.description;
+
+    mapPoints.forEach((point) => {
+      const active = point.dataset.place === id;
+      point.classList.toggle("active", active);
+      point.setAttribute("aria-pressed", String(active));
+    });
+
+    if (!artwork || !place.image) return;
+    artwork.classList.add("is-loading");
+
+    const finishLoading = () => {
+      artwork.classList.remove("is-loading");
+      try { updateThemeFromImage(artwork); }
+      catch (error) { console.warn("Nie udało się dopasować motywu:", error); }
+    };
+
+    artwork.onload = finishLoading;
+    artwork.onerror = () => {
+      artwork.classList.remove("is-loading");
+      console.warn("Nie udało się wczytać obrazu miejsca:", place.image);
+    };
+    artwork.src = new URL(place.image, document.baseURI).href;
   }
 
-  artwork.onload = () => {
-    artwork.classList.remove("is-loading");
-    applyTheme();
-  };
-
-  artwork.onerror = () => {
-    artwork.classList.remove("is-loading");
-    console.error("Could not load image:", place.image);
-  };
-
-  artwork.classList.add("is-loading");
-  artwork.dataset.currentImage = place.image;
-  artwork.src = place.image;
-}
-
-function updateThemeFromImage(image) {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d", {
-    willReadFrequently: true
-  });
-
-  // Small sample = fast computation.
-  canvas.width = 40;
-  canvas.height = 40;
-
-  ctx.drawImage(image, 0, 0, 40, 40);
-
-  const pixels = ctx.getImageData(
-    0, 0, 40, 40
-  ).data;
-
-  const samples = [];
-
-  for (let i = 0; i < pixels.length; i += 16) {
-    if (pixels[i + 3] < 128) continue;
-
-    samples.push([
-      pixels[i],
-      pixels[i + 1],
-      pixels[i + 2]
-    ]);
-  }
-
-  if (!samples.length) return;
-
-  // Reuse the k-means function already in your script.
-  const colors = kMeans(samples, 3, 10);
-  const colors = currentPalette;
-
-if (colors.length >= 4) {
-  const root = document.documentElement;
-
-  root.style.setProperty("--paper", paletteColor(colors[0]));
-  root.style.setProperty("--accent", paletteColor(colors[1]));
-  root.style.setProperty("--panel", paletteColor(colors[2]));
-  root.style.setProperty("--line", paletteColor(colors[3]));
-  root.style.setProperty("--card", paletteColor(colors[2]));
-  root.style.setProperty("--link", paletteColor(colors[3]));
-}
-
-  if (!colors.length) return;
-
-  // Most common cluster becomes the main accent.
-  colors.sort((a, b) => b.count - a.count);
-
-  const accent = colors[0].hex;
-  const second = colors[1]?.hex || accent;
-  const third = colors[2]?.hex || second;
-
-  // Calculate a neutral background from the sampled image.
-  const average = samples.reduce(
-    (sum, rgb) => sum.map((v, i) => v + rgb[i]),
-    [0, 0, 0]
-  ).map(v => Math.round(v / samples.length));
-
-  const lightness =
-    (average[0] * 0.299) +
-    (average[1] * 0.587) +
-    (average[2] * 0.114);
-
-  const paper = lightness > 145
-    ? rgbToHex(average.map(v => Math.round(v * 0.25 + 191)))
-    : "#f7f6f2";
-
-  const root = document.documentElement;
-
-  root.style.setProperty("--paper", paper);
-  root.style.setProperty("--accent", accent);
-  root.style.setProperty("--panel", second);
-  root.style.setProperty("--line", third);
-
-  // Choose readable foreground text automatically.
-  root.style.setProperty(
-    "--ink",
-    lightness > 145 ? "#20211f" : "#20211f"
-  );
-
-  root.style.setProperty("--muted", "#66675f");
-
-  // Keep the map marker in sync with the theme.
-  document.querySelectorAll(".point-dot").forEach(dot => {
-    dot.style.fill = accent;
-  });
-}
-  mapPoints.forEach(point => {
+  mapPoints.forEach((point) => {
     point.addEventListener("mouseenter", () => selectPlace(point.dataset.place));
     point.addEventListener("focus", () => selectPlace(point.dataset.place));
     point.addEventListener("click", () => selectPlace(point.dataset.place));
-    point.addEventListener("keydown", e => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
+    point.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
         selectPlace(point.dataset.place);
       }
     });
@@ -188,50 +90,61 @@ if (colors.length >= 4) {
   const canvas = $("creative-canvas");
   const canvasInstruction = $("canvas-instruction");
   const samplingCanvas = $("sampling-canvas");
-  const ctx = samplingCanvas.getContext("2d", { willReadFrequently: true });
+  const ctx = samplingCanvas ? samplingCanvas.getContext("2d", { willReadFrequently: true }) : null;
+
   let currentPalette = [];
   let selectedColor = null;
   let shapeCount = 0;
-  let lastAnalysis = null;
+  let currentObjectUrl = null;
 
-  upload.addEventListener("change", () => {
-    const file = upload.files && upload.files[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      status.textContent = "Wybierz plik obrazu.";
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    image.onload = () => {
-      empty.hidden = true;
-      image.hidden = false;
-      analyzeButton.disabled = false;
-      status.textContent = "Obraz gotowy. Uruchom analizę kolorów.";
-      URL.revokeObjectURL(url);
-      currentPalette = [];
-      paletteEl.innerHTML = '<div class="palette-empty">Uruchom analizę, aby zobaczyć kolory.</div>';
-      barEl.innerHTML = "";
-      makerColors.innerHTML = '<span class="maker-placeholder">Wygeneruj nową paletę.</span>';
-      addShapeButton.disabled = true;
-    };
-    image.onerror = () => {
-      status.textContent = "Nie udało się otworzyć obrazu. Spróbuj innego pliku.";
-      URL.revokeObjectURL(url);
-    };
-    image.src = url;
-  });
+  if (upload && image && analyzeButton && countSelect && status && paletteEl && barEl && makerColors && addShapeButton && canvas && canvasInstruction && ctx) {
+    upload.addEventListener("change", () => {
+      const file = upload.files && upload.files[0];
+      if (!file) return;
 
-  countSelect.addEventListener("change", () => {
-    if (image.complete && image.naturalWidth) runAnalysis();
-  });
-  analyzeButton.addEventListener("click", runAnalysis);
+      if (!file.type.startsWith("image/")) {
+        status.textContent = "Wybierz plik obrazu.";
+        upload.value = "";
+        return;
+      }
+
+      if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+      currentObjectUrl = URL.createObjectURL(file);
+      image.onload = () => {
+        empty.hidden = true;
+        image.hidden = false;
+        analyzeButton.disabled = false;
+        status.textContent = "Obraz gotowy. Uruchom analizę kolorów.";
+        currentPalette = [];
+        paletteEl.innerHTML = '<div class="palette-empty">Uruchom analizę, aby zobaczyć kolory.</div>';
+        barEl.innerHTML = "";
+        makerColors.innerHTML = '<span class="maker-placeholder">Wygeneruj nową paletę.</span>';
+        addShapeButton.disabled = true;
+        selectedColor = null;
+      };
+      image.onerror = () => {
+        status.textContent = "Nie udało się otworzyć obrazu. Spróbuj innego pliku.";
+        analyzeButton.disabled = true;
+      };
+      image.src = currentObjectUrl;
+    });
+
+    countSelect.addEventListener("change", () => {
+      if (image.complete && image.naturalWidth) runAnalysis();
+    });
+    analyzeButton.addEventListener("click", runAnalysis);
+  }
 
   function runAnalysis() {
-    if (!image.naturalWidth) return;
+    if (!image || !image.naturalWidth || !ctx) {
+      status.textContent = "Najpierw wybierz obraz.";
+      return;
+    }
+
     analyzeButton.disabled = true;
     status.textContent = "Analizuję próbkę pikseli…";
     $("result-tag").textContent = "OBLICZENIA";
-    // Defer heavy work by one frame so the status update can render.
+
     requestAnimationFrame(() => {
       try {
         const maxSide = 180;
@@ -240,32 +153,30 @@ if (colors.length >= 4) {
         samplingCanvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
         ctx.clearRect(0, 0, samplingCanvas.width, samplingCanvas.height);
         ctx.drawImage(image, 0, 0, samplingCanvas.width, samplingCanvas.height);
+
         const pixels = ctx.getImageData(0, 0, samplingCanvas.width, samplingCanvas.height).data;
         const samples = [];
-        // Deterministic stride sampling keeps the project quick on large photos.
         const pixelCount = pixels.length / 4;
         const stride = Math.max(1, Math.floor(pixelCount / 12000));
+
         for (let p = 0; p < pixelCount; p += stride) {
           const i = p * 4;
-          if (pixels[i + 3] < 128) continue;
-          samples.push([pixels[i], pixels[i + 1], pixels[i + 2]]);
+          if (pixels[i + 3] >= 128) samples.push([pixels[i], pixels[i + 1], pixels[i + 2]]);
         }
         if (!samples.length) throw new Error("Brak widocznych pikseli.");
-        const k = Math.min(Number(countSelect.value), samples.length);
+
+        const k = Math.min(Number(countSelect.value) || 5, samples.length);
         currentPalette = kMeans(samples, k, 12);
-        const total = currentPalette.reduce((sum, c) => sum + c.count, 0) || 1;
-        updateThemeFromImage(image);
-        currentPalette.forEach(c => c.share = c.count / total * 100);
+        const total = currentPalette.reduce((sum, color) => sum + color.count, 0) || 1;
+        currentPalette.forEach((color) => color.share = color.count / total * 100);
         currentPalette.sort((a, b) => b.count - a.count);
-        lastAnalysis = currentPalette;
+
         renderPalette(currentPalette);
         renderMakerColors(currentPalette);
-        addShapeButton.disabled = false;
+        updateThemeFromPalette(currentPalette);
+        addShapeButton.disabled = currentPalette.length === 0;
         $("result-tag").textContent = "GOTOWE";
         status.textContent = `Przeanalizowano ${samples.length.toLocaleString("pl-PL")} próbkowanych pikseli.`;
-        function paletteColor(color) {
-  return `rgb(${color.r}, ${color.g}, ${color.b})`;
-}
       } catch (error) {
         console.error(error);
         status.textContent = "Nie udało się przeanalizować tego obrazu. Spróbuj innego pliku.";
@@ -277,59 +188,91 @@ if (colors.length >= 4) {
   }
 
   function kMeans(points, k, maxIterations) {
-    // Initialize centroids from evenly spaced positions in the sampled array.
-    let centroids = [];
-    for (let i = 0; i < k; i++) {
-      centroids.push(points[Math.floor((i + 0.5) * points.length / k)].slice());
-    }
+    const centroids = [];
+    for (let i = 0; i < k; i++) centroids.push(points[Math.floor((i + 0.5) * points.length / k)].slice());
+
     let assignments = new Array(points.length).fill(0);
     for (let iter = 0; iter < maxIterations; iter++) {
-      const sums = Array.from({length:k}, () => [0,0,0,0]);
+      const sums = Array.from({ length: k }, () => [0, 0, 0, 0]);
       for (let i = 0; i < points.length; i++) {
         let best = 0, bestDist = Infinity;
         for (let c = 0; c < k; c++) {
-          const dr = points[i][0]-centroids[c][0];
-          const dg = points[i][1]-centroids[c][1];
-          const db = points[i][2]-centroids[c][2];
-          const dist = dr*dr + dg*dg + db*db;
+          const dr = points[i][0] - centroids[c][0];
+          const dg = points[i][1] - centroids[c][1];
+          const db = points[i][2] - centroids[c][2];
+          const dist = dr * dr + dg * dg + db * db;
           if (dist < bestDist) { bestDist = dist; best = c; }
         }
         assignments[i] = best;
         sums[best][0] += points[i][0];
         sums[best][1] += points[i][1];
         sums[best][2] += points[i][2];
-        sums[best][3] += 1;
+        sums[best][3]++;
       }
+
       let changed = false;
       for (let c = 0; c < k; c++) {
         if (sums[c][3] > 0) {
-          const next = sums[c].slice(0,3).map(v => v / sums[c][3]);
+          const next = sums[c].slice(0, 3).map((value) => value / sums[c][3]);
           if (distanceSquared(next, centroids[c]) > 1) changed = true;
           centroids[c] = next;
         }
       }
       if (!changed && iter > 0) break;
     }
+
     const counts = Array(k).fill(0);
-    for (const a of assignments) counts[a]++;
+    assignments.forEach((assignment) => counts[assignment]++);
     return centroids.map((rgb, i) => ({
-      rgb: rgb.map(v => Math.round(v)),
+      rgb: rgb.map(Math.round),
       count: counts[i],
       hex: rgbToHex(rgb)
-    })).filter(c => c.count > 0);
+    })).filter((color) => color.count > 0);
   }
-  function distanceSquared(a,b) {
-    return (a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2;
+
+  function distanceSquared(a, b) {
+    return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
   }
+
   function rgbToHex(rgb) {
-    return "#" + rgb.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2,"0")).join("").toUpperCase();
+    return "#" + rgb.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("").toUpperCase();
   }
+
+  function updateThemeFromPalette(palette) {
+    if (!palette || !palette.length) return;
+    const colors = [...palette].sort((a, b) => b.count - a.count);
+    root.style.setProperty("--paper", "#f3e8d4");
+    root.style.setProperty("--accent", colors[0].hex);
+    root.style.setProperty("--panel", (colors[1] || colors[0]).hex);
+    root.style.setProperty("--line", (colors[2] || colors[0]).hex);
+    root.style.setProperty("--card", (colors[1] || colors[0]).hex);
+    root.style.setProperty("--link", (colors[2] || colors[0]).hex);
+    root.style.setProperty("--ink", "#342d27");
+    root.style.setProperty("--text", "#342d27");
+    root.style.setProperty("--muted", "#6e6255");
+  }
+
+  function updateThemeFromImage(sourceImage) {
+    if (!sourceImage || !sourceImage.naturalWidth) return;
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = tempCanvas.height = 40;
+    const tempCtx = tempCanvas.getContext("2d", { willReadFrequently: true });
+    tempCtx.drawImage(sourceImage, 0, 0, 40, 40);
+    const data = tempCtx.getImageData(0, 0, 40, 40).data;
+    const samples = [];
+    for (let i = 0; i < data.length; i += 16) {
+      if (data[i + 3] >= 128) samples.push([data[i], data[i + 1], data[i + 2]]);
+    }
+    if (samples.length) updateThemeFromPalette(kMeans(samples, 3, 8));
+  }
+
   function renderPalette(palette) {
     paletteEl.innerHTML = "";
     barEl.innerHTML = "";
     const legend = document.createElement("div");
     legend.className = "proportion-legend";
-    palette.forEach((color, index) => {
+
+    palette.forEach((color) => {
       const row = document.createElement("div");
       row.className = "palette-item";
       const swatch = document.createElement("div");
@@ -343,6 +286,7 @@ if (colors.length >= 4) {
       rgb.className = "color-meta";
       rgb.textContent = `RGB ${color.rgb.join(", ")}`;
       meta.append(hex, rgb);
+
       const copy = document.createElement("button");
       copy.className = "copy-color";
       copy.textContent = "Kopiuj";
@@ -379,76 +323,86 @@ if (colors.length >= 4) {
     });
     paletteEl.append(legend);
   }
+
   function renderMakerColors(palette) {
     makerColors.innerHTML = "";
-    palette.forEach((color, i) => {
+    palette.forEach((color, index) => {
       const button = document.createElement("button");
+      button.type = "button";
       button.className = "color-choice";
       button.style.background = color.hex;
       button.title = `Wybierz ${color.hex}`;
       button.setAttribute("aria-label", `Wybierz kolor ${color.hex}`);
-      button.setAttribute("aria-pressed", String(i === 0));
+      button.setAttribute("aria-pressed", String(index === 0));
       button.addEventListener("click", () => {
         selectedColor = color.hex;
-        makerColors.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === button)));
+        makerColors.querySelectorAll("button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
       });
       makerColors.append(button);
-      if (i === 0) selectedColor = color.hex;
+      if (index === 0) selectedColor = color.hex;
     });
   }
 
-  addShapeButton.addEventListener("click", () => {
-    if (!selectedColor) return;
-    canvasInstruction.hidden = true;
-    const shapeType = $("shape-select").value;
-    const shape = document.createElement("button");
-    shape.type = "button";
-    shape.className = `canvas-shape shape-${shapeType}`;
-    shape.setAttribute("aria-label", "Przesuń kształt kompozycji");
-    const size = 42 + (shapeCount % 4) * 13;
-    shapeCount++;
-    if (shapeType === "triangle") {
-      shape.style.setProperty("--half", `${size/2}px`);
-      shape.style.setProperty("--shape-height", `${size}px`);
-      shape.style.setProperty("--shape-color", selectedColor);
-      shape.style.width = "0";
-      shape.style.height = "0";
-      shape.style.borderLeft = `${size/2}px solid transparent`;
-      shape.style.borderRight = `${size/2}px solid transparent`;
-      shape.style.borderBottom = `${size}px solid ${selectedColor}`;
-    } else {
-      shape.style.width = `${size}px`;
-      shape.style.height = `${size}px`;
-      shape.style.background = selectedColor;
-    }
-    shape.style.left = `${8 + ((shapeCount * 17) % 65)}%`;
-    shape.style.top = `${10 + ((shapeCount * 23) % 65)}%`;
-    enableDrag(shape);
-    canvas.append(shape);
-    shape.focus();
-  });
-  function enableDrag(el) {
-    let startX, startY, initialLeft, initialTop;
-    el.addEventListener("pointerdown", e => {
-      const rect = canvas.getBoundingClientRect();
-      const er = el.getBoundingClientRect();
-      startX = e.clientX; startY = e.clientY;
-      initialLeft = er.left - rect.left; initialTop = er.top - rect.top;
-      el.setPointerCapture(e.pointerId);
-    });
-    el.addEventListener("pointermove", e => {
-      if (!el.hasPointerCapture(e.pointerId)) return;
-      const rect = canvas.getBoundingClientRect();
-      const er = el.getBoundingClientRect();
-      const x = Math.max(0, Math.min(rect.width - er.width, initialLeft + e.clientX - startX));
-      const y = Math.max(0, Math.min(rect.height - er.height, initialTop + e.clientY - startY));
-      el.style.left = `${x}px`;
-      el.style.top = `${y}px`;
+  if ($("add-shape") && canvas && canvasInstruction) {
+    addShapeButton.addEventListener("click", () => {
+      if (!selectedColor) return;
+      canvasInstruction.hidden = true;
+      const shapeType = $("shape-select").value;
+      const shape = document.createElement("button");
+      shape.type = "button";
+      shape.className = `canvas-shape shape-${shapeType}`;
+      shape.setAttribute("aria-label", "Przesuń kształt kompozycji");
+      const size = 42 + (shapeCount % 4) * 13;
+      shapeCount++;
+
+      if (shapeType === "triangle") {
+        shape.style.width = "0";
+        shape.style.height = "0";
+        shape.style.borderLeft = `${size / 2}px solid transparent`;
+        shape.style.borderRight = `${size / 2}px solid transparent`;
+        shape.style.borderBottom = `${size}px solid ${selectedColor}`;
+      } else {
+        shape.style.width = `${size}px`;
+        shape.style.height = `${size}px`;
+        shape.style.background = selectedColor;
+      }
+      shape.style.left = `${8 + ((shapeCount * 17) % 65)}%`;
+      shape.style.top = `${10 + ((shapeCount * 23) % 65)}%`;
+      enableDrag(shape);
+      canvas.append(shape);
+      shape.focus();
     });
   }
-  $("clear-canvas").addEventListener("click", () => {
-    canvas.querySelectorAll(".canvas-shape").forEach(el => el.remove());
+
+  function enableDrag(element) {
+    let startX, startY, initialLeft, initialTop;
+    element.addEventListener("pointerdown", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+      startX = event.clientX;
+      startY = event.clientY;
+      initialLeft = elementRect.left - rect.left;
+      initialTop = elementRect.top - rect.top;
+      element.setPointerCapture(event.pointerId);
+    });
+    element.addEventListener("pointermove", (event) => {
+      if (!element.hasPointerCapture(event.pointerId)) return;
+      const rect = canvas.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+      const x = Math.max(0, Math.min(rect.width - elementRect.width, initialLeft + event.clientX - startX));
+      const y = Math.max(0, Math.min(rect.height - elementRect.height, initialTop + event.clientY - startY));
+      element.style.left = `${x}px`;
+      element.style.top = `${y}px`;
+    });
+  }
+
+  const clearButton = $("clear-canvas");
+  if (clearButton) clearButton.addEventListener("click", () => {
+    canvas.querySelectorAll(".canvas-shape").forEach((element) => element.remove());
     canvasInstruction.hidden = false;
     shapeCount = 0;
   });
+
+  // Start with a working default place; image paths are relative to the repository root.
+  selectPlace("krakow");
 })();
