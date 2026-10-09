@@ -30,34 +30,104 @@
   $("place-kicker").textContent = place.kicker;
   $("place-description").textContent = place.description;
 
-  // Highlight the selected location.
   mapPoints.forEach(point => {
     const active = point.dataset.place === id;
     point.classList.toggle("active", active);
     point.setAttribute("aria-pressed", String(active));
   });
 
-  // Display YOUR selected artwork.
   const artwork = $("place-artwork");
+  if (!artwork || !place.image) return;
 
-  if (artwork.dataset.currentImage !== place.image) {
-    artwork.classList.add("is-loading");
-
-    artwork.onload = () => {
-      artwork.classList.remove("is-loading");
+  const applyTheme = () => {
+    try {
       updateThemeFromImage(artwork);
-    };
+    } catch (error) {
+      console.error("Theme update failed:", error);
+    }
+  };
 
-    artwork.onerror = () => {
-      artwork.classList.remove("is-loading");
-      console.error("Nie udało się wczytać obrazu:", place.image);
-    };
-
-    artwork.dataset.currentImage = place.image;
-    artwork.src = place.image;
-  } else if (artwork.complete && artwork.naturalWidth) {
-    updateThemeFromImage(artwork);
+  if (artwork.dataset.currentImage === place.image &&
+      artwork.complete && artwork.naturalWidth) {
+    applyTheme();
+    return;
   }
+
+  artwork.onload = () => {
+    artwork.classList.remove("is-loading");
+    applyTheme();
+  };
+
+  artwork.onerror = () => {
+    artwork.classList.remove("is-loading");
+    console.error("Could not load image:", place.image);
+  };
+
+  artwork.classList.add("is-loading");
+  artwork.dataset.currentImage = place.image;
+  artwork.src = place.image;
+}
+
+function updateThemeFromImage(image) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 40;
+  canvas.height = 40;
+
+  const ctx = canvas.getContext("2d", {
+    willReadFrequently: true
+  });
+
+  ctx.drawImage(image, 0, 0, 40, 40);
+
+  const data = ctx.getImageData(0, 0, 40, 40).data;
+  const samples = [];
+
+  for (let i = 0; i < data.length; i += 16) {
+    if (data[i + 3] >= 128) {
+      samples.push([data[i], data[i + 1], data[i + 2]]);
+    }
+  }
+
+  if (!samples.length) return;
+
+  // Uses your existing kMeans() and rgbToHex() functions.
+  const colors = kMeans(samples, 3, 10)
+    .sort((a, b) => b.count - a.count);
+
+  if (!colors.length) return;
+
+  const root = document.documentElement;
+  const dominant = colors[0].rgb;
+  const secondary = colors[1]?.hex || colors[0].hex;
+  const tertiary = colors[2]?.hex || secondary;
+
+  const average = samples.reduce(
+    (sum, rgb) => sum.map((v, i) => v + rgb[i]),
+    [0, 0, 0]
+  ).map(v => Math.round(v / samples.length));
+
+  // Blend the image's average color toward white for a soft paper background.
+  const paperRgb = average.map(v =>
+    Math.round(v * 0.18 + 255 * 0.82)
+  );
+
+  const paper = rgbToHex(paperRgb);
+  const brightness =
+    average[0] * 0.299 +
+    average[1] * 0.587 +
+    average[2] * 0.114;
+
+  root.style.setProperty("--paper", paper);
+  root.style.setProperty("--ink", brightness < 100 ? "#20211f" : "#20211f");
+  root.style.setProperty("--muted", "#66675f");
+  root.style.setProperty("--panel", secondary);
+  root.style.setProperty("--line", tertiary);
+  root.style.setProperty("--accent", colors[0].hex);
+
+  // Keep the map markers consistent with the new accent.
+  document.querySelectorAll(".point-dot").forEach(dot => {
+    dot.style.fill = dominant.length ? colors[0].hex : "#a74635";
+  });
 }
 function updateThemeFromImage(image) {
   const canvas = document.createElement("canvas");
