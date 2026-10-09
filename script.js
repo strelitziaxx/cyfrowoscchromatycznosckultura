@@ -6,31 +6,136 @@
       title: "Kraków",
       kicker: "MAMA",
       description: "To skąd moja mama. Nigdy nie zapomne rój gołębi przy sukiennicach, walczące o jakąś wszelką cząsteczke obważanka. Ale to tak w nawisie mówiąc, bo główna atrakcja to atmosfera jakby z innego wieku."
+      image: "images/krakow-folk.jpg"
     },
     rzeszow: {
       title: "Rzeszów",
       kicker: "TATA",
       description: "A stąd mój tata."
+      image: "images/krakow-folk.jpg"
     },
     boleslawiec: {
       title: "Bolesławiec",
       kicker: "CERAMIKA LUDOWA",
       description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory, które spotkałam w sklepach nawet poza Polską, to moja inspiracja dla badania koloru."
+      image: "images/krakow-folk.jpg"
     }
   };
   const mapPoints = [...document.querySelectorAll(".map-point")];
   function selectPlace(id) {
-    const place = places[id];
-    if (!place) return;
-    $("place-title").textContent = place.title;
-    $("place-kicker").textContent = place.kicker;
-    $("place-description").textContent = place.description;
-    mapPoints.forEach(p => {
-      const active = p.dataset.place === id;
-      p.classList.toggle("active", active);
-      p.setAttribute("aria-pressed", String(active));
-    });
+  const place = places[id];
+  if (!place) return;
+
+  $("place-title").textContent = place.title;
+  $("place-kicker").textContent = place.kicker;
+  $("place-description").textContent = place.description;
+
+  // Highlight the selected location.
+  mapPoints.forEach(point => {
+    const active = point.dataset.place === id;
+    point.classList.toggle("active", active);
+    point.setAttribute("aria-pressed", String(active));
+  });
+
+  // Display YOUR selected artwork.
+  const artwork = $("place-artwork");
+
+  if (artwork.dataset.currentImage !== place.image) {
+    artwork.classList.add("is-loading");
+
+    artwork.onload = () => {
+      artwork.classList.remove("is-loading");
+      updateThemeFromImage(artwork);
+    };
+
+    artwork.onerror = () => {
+      artwork.classList.remove("is-loading");
+      console.error("Nie udało się wczytać obrazu:", place.image);
+    };
+
+    artwork.dataset.currentImage = place.image;
+    artwork.src = place.image;
+  } else if (artwork.complete && artwork.naturalWidth) {
+    updateThemeFromImage(artwork);
   }
+}
+function updateThemeFromImage(image) {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d", {
+    willReadFrequently: true
+  });
+
+  // Small sample = fast computation.
+  canvas.width = 40;
+  canvas.height = 40;
+
+  ctx.drawImage(image, 0, 0, 40, 40);
+
+  const pixels = ctx.getImageData(
+    0, 0, 40, 40
+  ).data;
+
+  const samples = [];
+
+  for (let i = 0; i < pixels.length; i += 16) {
+    if (pixels[i + 3] < 128) continue;
+
+    samples.push([
+      pixels[i],
+      pixels[i + 1],
+      pixels[i + 2]
+    ]);
+  }
+
+  if (!samples.length) return;
+
+  // Reuse the k-means function already in your script.
+  const colors = kMeans(samples, 3, 10);
+
+  if (!colors.length) return;
+
+  // Most common cluster becomes the main accent.
+  colors.sort((a, b) => b.count - a.count);
+
+  const accent = colors[0].hex;
+  const second = colors[1]?.hex || accent;
+  const third = colors[2]?.hex || second;
+
+  // Calculate a neutral background from the sampled image.
+  const average = samples.reduce(
+    (sum, rgb) => sum.map((v, i) => v + rgb[i]),
+    [0, 0, 0]
+  ).map(v => Math.round(v / samples.length));
+
+  const lightness =
+    (average[0] * 0.299) +
+    (average[1] * 0.587) +
+    (average[2] * 0.114);
+
+  const paper = lightness > 145
+    ? rgbToHex(average.map(v => Math.round(v * 0.25 + 191)))
+    : "#f7f6f2";
+
+  const root = document.documentElement;
+
+  root.style.setProperty("--paper", paper);
+  root.style.setProperty("--accent", accent);
+  root.style.setProperty("--panel", second);
+  root.style.setProperty("--line", third);
+
+  // Choose readable foreground text automatically.
+  root.style.setProperty(
+    "--ink",
+    lightness > 145 ? "#20211f" : "#20211f"
+  );
+
+  root.style.setProperty("--muted", "#66675f");
+
+  // Keep the map marker in sync with the theme.
+  document.querySelectorAll(".point-dot").forEach(dot => {
+    dot.style.fill = accent;
+  });
+}
   mapPoints.forEach(point => {
     point.addEventListener("mouseenter", () => selectPlace(point.dataset.place));
     point.addEventListener("focus", () => selectPlace(point.dataset.place));
