@@ -44,7 +44,7 @@
     "rzeszow": {
       title: "Rzeszów",
       kicker: "MIASTO · PODKARPACIE",
-      description: "Rzeszów, stolica Podkarpacia, jest punktem odniesienia dla południowo-wschodniej Polski. To miejsce pozwala zastanowić się nad tym, jak lokalna kultura, krajobraz i pamięć kształtują nasze skojarzenia z kolorem.",
+      description: "Rzeszów, stolica Podkarpacia; to skąd mój tata.",
       image: "images/rzeszow.jpg",
       alt: "Rzeszów — miejsce na mapie inspiracji"
     },
@@ -474,5 +474,5 @@
   });
 
   // Start with a working default place; image paths are relative to the repository root.
-  selectPlace("krakow-golebie");
+  selectPlace("");
 })();
