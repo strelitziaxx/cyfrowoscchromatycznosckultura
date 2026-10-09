@@ -4,13 +4,18 @@
   const places = {
     krakow: {
       title: "Kraków",
-      kicker: "RODZINNE SKOJARZENIA",
-      description: "Rodzinne miasto moich rodziców — osobisty punkt wyjścia do pytania o pamięć, miejsce i przynależność."
+      kicker: "MAMA",
+      description: "To skąd moja mama. Nigdy nie zapomne rój gołębi przy sukiennicach, walczące o jakąś wszelką cząsteczke obważanka. Ale to tak w nawisie mówiąc, bo główna atrakcja to atmosfera jakby z innego wieku."
+    },
+    rzeszow: {
+      title: "Rzeszów",
+      kicker: "TATA",
+      description: "A stąd mój tata."
     },
     boleslawiec: {
       title: "Bolesławiec",
-      kicker: "INSPIRACJA CERAMICZNA",
-      description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory są jednym z wizualnych punktów odniesienia dla badania koloru."
+      kicker: "CERAMIKA LUDOWA",
+      description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory, które spotkałam w sklepach nawet poza Polską, to moja inspiracja dla badania koloru."
     }
   };
   const mapPoints = [...document.querySelectorAll(".map-point")];
