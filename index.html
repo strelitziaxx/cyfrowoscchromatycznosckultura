@@ -96,7 +96,7 @@
           <p class="eyebrow">02 / OBRAZ → DANE</p>
           <h2 id="analysis-heading">Matematyka koloru</h2>
         </div>
-        <p class="section-note">To Ty wybierasz obraz. Kod analizuje jego piksele — nie tworzy ani nie interpretuje dzieła.</p>
+        <p class="section-note">To Ty możesz wybrać obraz. Kod analizuje jego piksele na podstawie <strong>k-means</strong> i wyznacza środek każdej grupy. Resultat pokazuje jaka część próbkowanych pikseli należy do danego klastra.</p>
       </div>
 
       <div class="analysis-grid">
@@ -105,13 +105,13 @@
             <div class="empty-state" id="empty-state">
               <span class="upload-mark" aria-hidden="true">＋</span>
               <p>Dodaj własną fotografię</p>
-              <small>JPG, PNG, WebP · obraz pozostaje w Twojej przeglądarce</small>
+              <small>JPG, PNG, WEBP · obraz pozostaje w Twojej przeglądarce</small>
             </div>
             <img id="source-image" alt="Wybrany przez użytkownika obraz do analizy kolorów" hidden>
           </div>
           <label class="upload-button" for="image-upload">Wybierz obraz</label>
           <input id="image-upload" type="file" accept="image/*">
-          <p class="microcopy">Używaj zdjęć własnych albo materiałów, które możesz legalnie wykorzystać. Dodaj źródło i opis przed publikacją.</p>
+          <p class="microcopy">Używaj zdjęć własnych albo materiałów, które możesz legalnie wykorzystać.</p>
           <div class="controls">
             <label for="cluster-count">Liczba kolorów</label>
             <select id="cluster-count">
@@ -151,10 +151,10 @@
     <section class="canvas-section section-wrap" aria-labelledby="canvas-heading">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">03 / DECYZJA NALEŻY DO CIEBIE</p>
+          <p class="eyebrow">03 / TWOJA KOMPOZYCJA</p>
           <h2 id="canvas-heading">Zacznij komponować</h2>
         </div>
-        <p class="section-note">Paleta jest materiałem wyjściowym, nie gotowym dziełem. Wybierz kolor, a potem zdecyduj, jak go wykorzystać.</p>
+        <p class="section-note">Wybierz kolor, a potem zdecyduj, jak go wykorzystać.</p>
       </div>
       <div class="maker">
         <div class="maker-tools">
@@ -169,32 +169,32 @@
             <option value="triangle">Trójkąt</option>
           </select>
           <button class="button button-outline" id="add-shape" disabled>Dodaj kształt</button>
-          <button class="text-button" id="clear-canvas">Wyczyść kompozycję</button>
-          <p class="microcopy">To proste narzędzie do eksperymentowania z barwami, nie generator gotowej sztuki.</p>
+          <button class="text-button" id="clear-canvas">Wyczyść przestrzeń</button>
+          <p class="microcopy">To narzędzie do eksperymentowania z barwami dla osoby, nie maszyny.</p>
         </div>
         <div class="canvas-wrap">
           <div class="creative-canvas" id="creative-canvas" aria-label="Twoja kompozycja. Dodawaj i przeciągaj kształty.">
-            <p class="canvas-instruction" id="canvas-instruction">Twoja przestrzeń twórcza<br><span>Dodaj kształty z wybranej palety.</span></p>
+            <p class="canvas-instruction" id="canvas-instruction">Twoja przestrzeń do tworzenia.<br><span>Dodaj kształty z wybranej palety.</span></p>
           </div>
-          <p class="canvas-caption">KOMPOZYCJA AUTORSKA · PRZECIĄGAJ KSZTAŁTY, ABY ZMIENIAĆ ICH POŁOŻENIE</p>
+          <p class="canvas-caption">PRZECIĄGNIJ KSZTAŁTY, ABY ZMIENIĆ ICH POŁOŻENIE</p>
         </div>
       </div>
     </section>
 
     <section class="idea-section section-wrap" id="idea">
       <p class="eyebrow">04 / IDEA</p>
-      <h2>Komputer analizuje kolory.<br><em>Interpretacja pozostaje ludzka.</em></h2>
+      <h2>Komputer analizuje kolory przy u<br><em>Interpretacja pozostaje ludzka.</em></h2>
       <div class="idea-copy">
         <p>Kolor może przywoływać miejsce, skojarzenie albo wspomnienie. Inspiracją do tego projektu jest moja więź z Polską, Kraków — rodzinne miasto moich rodziców — oraz tradycyjna sztuka ludowa, w tym ceramika z Bolesławca.</p>
-        <p>Algorytm może opisać barwy za pomocą liczb, znaleźć podobieństwa i wyznaczyć proporcje. Nie podejmuje jednak za mnie decyzji artystycznych. Dobór dzieł, forma strony i interpretacja wyników należą do mnie.</p>
-        <p class="closing-line">Paleta jest wynikiem obliczeń. Dzieło jest wynikiem decyzji.</p>
+        <p>Algorytm opisuje barwy za pomocą K-means clustering, znajdując podobieństwa i wyznaczywając proporcje. Nie podejmuje jednak za mnie decyzji artystycznych; dobór dzieł, forma strony i interpretacja wyników należą do mnie.</p>
+        <p class="closing-line">Tylko pamiętaj, że obliczenia to zawsze tylko streszczenie większego dzieła.</p>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <span>KOLORY PAMIĘCI</span>
-    <span>Projekt autorski · analiza kolorów w przeglądarce</span>
+    <span>Cyfrowość, Chromatyczność, Kultura</span>
+    <span>odkrywanie sztuki · a to wszystko w przeglądarce! :)</span>
   </footer>
 
   <canvas id="sampling-canvas" hidden></canvas>
