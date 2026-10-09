@@ -106,6 +106,18 @@ function updateThemeFromImage(image) {
 
   // Reuse the k-means function already in your script.
   const colors = kMeans(samples, 3, 10);
+  const colors = currentPalette;
+
+if (colors.length >= 4) {
+  const root = document.documentElement;
+
+  root.style.setProperty("--paper", paletteColor(colors[0]));
+  root.style.setProperty("--accent", paletteColor(colors[1]));
+  root.style.setProperty("--panel", paletteColor(colors[2]));
+  root.style.setProperty("--line", paletteColor(colors[3]));
+  root.style.setProperty("--card", paletteColor(colors[2]));
+  root.style.setProperty("--link", paletteColor(colors[3]));
+}
 
   if (!colors.length) return;
 
@@ -251,6 +263,9 @@ function updateThemeFromImage(image) {
         addShapeButton.disabled = false;
         $("result-tag").textContent = "GOTOWE";
         status.textContent = `Przeanalizowano ${samples.length.toLocaleString("pl-PL")} próbkowanych pikseli.`;
+        function paletteColor(color) {
+  return `rgb(${color.r}, ${color.g}, ${color.b})`;
+}
       } catch (error) {
         console.error(error);
         status.textContent = "Nie udało się przeanalizować tego obrazu. Spróbuj innego pliku.";
