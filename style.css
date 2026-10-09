@@ -350,43 +350,81 @@ input, textarea { border-color: var(--line); }
 .palette-item .swatch, .color-choice { border-color: var(--line); }
 
 
-/* === MAP LABEL LEGIBILITY === */
+/* === MAP LABELS: LEGIBILITY AND POSITIONING === */
 
-.poland-map .point-label {
-  font-family: inherit;
+.poland-map .map-point text {
+  font-family: var(--mono);
   font-size: 10px;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: 0.1px;
 
-  /* Use the current theme's text and background colors */
-  fill: var(--text, #252525);
-  stroke: var(--paper, #ffffff);
-  stroke-width: 3.5px;
+  /* Keep text readable over both light and dark map colors. */
+  fill: var(--text);
+  stroke: #f8f5ed;
+  stroke-width: 3px;
   stroke-linejoin: round;
   paint-order: stroke fill;
 
-  /* Keep labels readable and prevent them intercepting clicks */
   pointer-events: none;
-  user-select: none;
 }
 
-.poland-map .map-point {
-  cursor: pointer;
+/* Keep the original Bolesławiec and Rzeszów labels consistent. */
+.poland-map .point-label {
+  font-size: 10px;
+  font-weight: 700;
 }
 
-.poland-map .map-point:focus-visible {
-  outline: none;
+/* Make the map markers easy to see and select. */
+.poland-map .point-halo {
+  fill: var(--accent);
+  opacity: 0.18;
 }
 
-.poland-map .map-point:focus-visible .point-halo {
-  stroke: var(--text, #252525);
+.poland-map .point-dot {
+  fill: var(--accent);
+  stroke: #fffdf8;
   stroke-width: 2px;
 }
 
-/* Slightly smaller labels on narrow screens */
-@media (max-width: 480px) {
-  .poland-map .point-label {
-    font-size: 9px;
-    stroke-width: 3px;
+.poland-map .map-point:hover .point-halo,
+.poland-map .map-point:focus-visible .point-halo,
+.poland-map .map-point.active .point-halo {
+  opacity: 0.4;
+}
+
+/* Give the information card a clear visual hierarchy. */
+.place-card {
+  min-width: 0;
+}
+
+.place-card h3 {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.place-card > p:not(.eyebrow) {
+  color: var(--text);
+  line-height: 1.75;
+}
+
+.place-card .eyebrow,
+.place-card .place-hint {
+  color: var(--muted);
+}
+
+/* Prevent text and navigation from disappearing on small screens. */
+@media (max-width: 760px) {
+  .map-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .poland-map {
+    width: 100%;
+    height: auto;
+  }
+
+  .place-card {
+    padding-top: 12px;
   }
 }
+
