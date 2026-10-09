@@ -5,29 +5,40 @@
   const root = document.documentElement;
 
   const places = {
-    krakow: {
-      title: "Kraków",
-      kicker: "MAMA",
-      description: "To skąd moja mama. Nigdy nie zapomnę rojów gołębi przy Sukiennicach, walczących o okruszki obwarzanka. Ale to tak na marginesie — najważniejsza jest atmosfera jakby z innego wieku.",
-      image: "images/krakow-folk.jpg"
+    "krakow-golebie": {
+      title: "Kraków: gołębie",
+      kicker: "",
+      description: "",
+      image: "images/krakow-golebie.jpg",
+      alt: "Gołębie w Krakowie"
     },
-    rzeszow: {
-      title: "Rzeszów",
-      kicker: "TATA",
-      description: "A stąd mój tata.",
-      image: "images/rzeszow-folk.jpg"
+    "krakow-kocie-lby": {
+      title: "Kraków: kocie łby",
+      kicker: "",
+      description: "",
+      image: "images/krakow-kocie-lby.jpg",
+      alt: "Kocie łby — brukowana droga w Krakowie"
     },
-    boleslawiec: {
-      title: "Bolesławiec",
-      kicker: "CERAMIKA LUDOWA",
-      description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory, które spotkałam w sklepach nawet poza Polską, inspirują mnie do badania koloru.",
-      image: "images/boleslawiec-folk.jpg"
+    "warszawa-syrenka": {
+      title: "Warszawa: Syrenka Warszawska",
+      kicker: "",
+      description: "",
+      image: "images/warszawa-syrenka.jpg",
+      alt: "Syrenka Warszawska"
     },
-    warszawa: {
-      title: "Warszawa",
-      kicker: "STOLICA",
-      description: "Warszawa — kolejny punkt na mapie inspiracji.",
-      image: "images/warszawa-folk.jpg"
+    "tatry-oscypek": {
+      title: "Tatry: oscypek",
+      kicker: "",
+      description: "",
+      image: "images/oscypek-tatry.jpg",
+      alt: "Oscypek z południa Polski"
+    },
+    "pola": {
+      title: "Pola",
+      kicker: "",
+      description: "",
+      image: "images/pola.jpg",
+      alt: "Pola i trawy"
     }
   };
 
@@ -41,6 +52,7 @@
     $("place-title").textContent = place.title;
     $("place-kicker").textContent = place.kicker;
     $("place-description").textContent = place.description;
+    artwork?.setAttribute("alt", place.alt || place.title);
 
     mapPoints.forEach((point) => {
       const active = point.dataset.place === id;
@@ -240,30 +252,72 @@
 
   function updateThemeFromPalette(palette) {
     if (!palette || !palette.length) return;
-    const colors = [...palette].sort((a, b) => b.count - a.count);
-    root.style.setProperty("--paper", "#f3e8d4");
-    root.style.setProperty("--accent", colors[0].hex);
-    root.style.setProperty("--panel", (colors[1] || colors[0]).hex);
-    root.style.setProperty("--line", (colors[2] || colors[0]).hex);
-    root.style.setProperty("--card", (colors[1] || colors[0]).hex);
-    root.style.setProperty("--link", (colors[2] || colors[0]).hex);
-    root.style.setProperty("--ink", "#342d27");
-    root.style.setProperty("--text", "#342d27");
-    root.style.setProperty("--muted", "#6e6255");
+
+    // Blend extracted colors so the site visibly follows the image while text stays readable.
+    const ranked = [...palette].filter((color) => color && color.hex && color.rgb);
+    if (!ranked.length) return;
+    ranked.sort((a, b) => b.count - a.count);
+
+    const toHex = (rgb) => "#" + rgb.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("").toUpperCase();
+    const mix = (hex, target, amount) => {
+      const rgb = hex.match(/[0-9a-f]{2}/ig).map((v) => parseInt(v, 16));
+      const dest = target.match(/[0-9a-f]{2}/ig).map((v) => parseInt(v, 16));
+      return toHex(rgb.map((v, i) => v * (1 - amount) + dest[i] * amount));
+    };
+    const luminance = (hex) => {
+      const rgb = hex.match(/[0-9a-f]{2}/ig).map((v) => parseInt(v, 16) / 255).map((v) => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+      return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+    };
+    const saturation = (rgb) => {
+      const values = rgb.map((v) => v / 255);
+      return Math.max(...values) - Math.min(...values);
+    };
+
+    const lightest = [...ranked].sort((a, b) => luminance(b.hex) - luminance(a.hex))[0];
+    const darkest = [...ranked].sort((a, b) => luminance(a.hex) - luminance(b.hex))[0];
+    const accentColor = [...ranked].sort((a, b) => saturation(b.rgb) - saturation(a.rgb))[0];
+    const secondary = ranked.find((color) => color.hex !== accentColor.hex) || accentColor;
+    const paper = mix(lightest.hex, "#FFFFFF", 0.82);
+    const panel = mix(lightest.hex, "#FFFFFF", 0.63);
+    const card = mix(secondary.hex, "#FFFFFF", 0.76);
+    const line = mix(darkest.hex, paper, 0.72);
+    const text = luminance(paper) > 0.42 ? mix(darkest.hex, "#171512", 0.58) : "#FFFFFF";
+    const muted = mix(text, paper, 0.36);
+    const accent = accentColor.hex;
+    const link = luminance(accent) < 0.38 ? accent : mix(accent, "#27221E", 0.40);
+    const buttonText = luminance(accent) > 0.48 ? "#25211D" : "#FFFFFF";
+
+    const vars = {
+      "--paper": paper,
+      "--panel": panel,
+      "--card": card,
+      "--line": line,
+      "--accent": accent,
+      "--link": link,
+      "--input-bg": mix(lightest.hex, "#FFFFFF", 0.88),
+      "--button-bg": accent,
+      "--button-text": buttonText,
+      "--text": text,
+      "--ink": text,
+      "--muted": muted,
+      "--map-bg": mix(secondary.hex, "#FFFFFF", 0.78),
+      "--soft-accent": mix(accent, paper, 0.82)
+    };
+    Object.entries(vars).forEach(([name, value]) => root.style.setProperty(name, value));
   }
 
   function updateThemeFromImage(sourceImage) {
     if (!sourceImage || !sourceImage.naturalWidth) return;
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = tempCanvas.height = 40;
+    tempCanvas.width = tempCanvas.height = 72;
     const tempCtx = tempCanvas.getContext("2d", { willReadFrequently: true });
-    tempCtx.drawImage(sourceImage, 0, 0, 40, 40);
+    tempCtx.drawImage(sourceImage, 0, 0, 72, 72);
     const data = tempCtx.getImageData(0, 0, 40, 40).data;
     const samples = [];
-    for (let i = 0; i < data.length; i += 16) {
+    for (let i = 0; i < data.length; i += 8) {
       if (data[i + 3] >= 128) samples.push([data[i], data[i + 1], data[i + 2]]);
     }
-    if (samples.length) updateThemeFromPalette(kMeans(samples, 3, 8));
+    if (samples.length) updateThemeFromPalette(kMeans(samples, 6, 14));
   }
 
   function renderPalette(palette) {
@@ -404,5 +458,5 @@
   });
 
   // Start with a working default place; image paths are relative to the repository root.
-  selectPlace("krakow");
+  selectPlace("krakow-golebie");
 })();
