@@ -132,3 +132,99 @@ select { border:1px solid var(--line); background:var(--paper); color:var(--ink)
   .site-footer { flex-direction:column; }
 }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { transition:none!important; } }
+/* === KOLORY PAMIĘCI: DYNAMICZNY MOTYW === */
+
+:root {
+  --paper: #f7f6f2;
+  --ink: #20211f;
+  --muted: #777872;
+  --line: #dcdcd4;
+  --panel: #efeee8;
+  --accent: #a74635;
+}
+
+body,
+.site-header,
+.site-footer,
+.section-wrap,
+.intro,
+.map-panel,
+.place-card,
+.upload-panel,
+.results-panel,
+.maker,
+.creative-canvas,
+.math-note {
+  transition:
+    background-color 400ms ease,
+    color 400ms ease,
+    border-color 400ms ease;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+.site-header,
+.site-footer,
+.section-wrap {
+  border-color: var(--line);
+}
+
+.map-panel,
+.math-note,
+.creative-canvas {
+  background-color: var(--panel);
+}
+
+.eyebrow,
+.section-note,
+.microcopy,
+.map-caption {
+  color: var(--muted);
+}
+
+.wordmark span,
+.text-link:hover,
+.point-dot {
+  color: var(--accent);
+}
+
+.point-dot {
+  fill: var(--accent);
+}
+
+.point-halo {
+  fill: var(--accent);
+}
+
+/* Your selected artwork — never AI-generated */
+
+.place-artwork-frame {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  margin-bottom: 24px;
+  background: var(--panel);
+}
+
+#place-artwork {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 200ms ease;
+}
+
+#place-artwork.is-loading {
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
