@@ -5,20 +5,26 @@
     krakow: {
       title: "Kraków",
       kicker: "MAMA",
-      description: "To skąd moja mama. Nigdy nie zapomne rój gołębi przy sukiennicach, walczące o jakąś wszelką cząsteczke obważanka. Ale to tak w nawisie mówiąc, bo główna atrakcja to atmosfera jakby z innego wieku."
+      description: "To skąd moja mama. Nigdy nie zapomne rój gołębi przy sukiennicach, walczące o jakąś wszelką cząsteczke obważanka. Ale to tak w nawisie mówiąc, bo główna atrakcja to atmosfera jakby z innego wieku.",
       image: "images/boleslawiec-folk.jpg"
     },
     rzeszow: {
       title: "Rzeszów",
       kicker: "TATA",
-      description: "A stąd mój tata."
+      description: "A stąd mój tata.",
       image: "images/krakow-folk.jpg"
     },
     boleslawiec: {
       title: "Bolesławiec",
       kicker: "CERAMIKA LUDOWA",
-      description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory, które spotkałam w sklepach nawet poza Polską, to moja inspiracja dla badania koloru."
+      description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory, które spotkałam w sklepach nawet poza Polską, to moja inspiracja dla badania koloru.",
       image: "images/boleslawiec-folk.jpg"
+    },
+    warszawa: {
+      title: "Warszawa",
+      kicker: "STOLICA",
+      description: "Warszawa — kolejny punkt na mapie inspiracji.",
+      image: "images/warszawa-folk.jpg"
     }
   };
   const mapPoints = [...document.querySelectorAll(".map-point")];
@@ -68,67 +74,6 @@
   artwork.src = place.image;
 }
 
-function updateThemeFromImage(image) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 40;
-  canvas.height = 40;
-
-  const ctx = canvas.getContext("2d", {
-    willReadFrequently: true
-  });
-
-  ctx.drawImage(image, 0, 0, 40, 40);
-
-  const data = ctx.getImageData(0, 0, 40, 40).data;
-  const samples = [];
-
-  for (let i = 0; i < data.length; i += 16) {
-    if (data[i + 3] >= 128) {
-      samples.push([data[i], data[i + 1], data[i + 2]]);
-    }
-  }
-
-  if (!samples.length) return;
-
-  // Uses your existing kMeans() and rgbToHex() functions.
-  const colors = kMeans(samples, 3, 10)
-    .sort((a, b) => b.count - a.count);
-
-  if (!colors.length) return;
-
-  const root = document.documentElement;
-  const dominant = colors[0].rgb;
-  const secondary = colors[1]?.hex || colors[0].hex;
-  const tertiary = colors[2]?.hex || secondary;
-
-  const average = samples.reduce(
-    (sum, rgb) => sum.map((v, i) => v + rgb[i]),
-    [0, 0, 0]
-  ).map(v => Math.round(v / samples.length));
-
-  // Blend the image's average color toward white for a soft paper background.
-  const paperRgb = average.map(v =>
-    Math.round(v * 0.18 + 255 * 0.82)
-  );
-
-  const paper = rgbToHex(paperRgb);
-  const brightness =
-    average[0] * 0.299 +
-    average[1] * 0.587 +
-    average[2] * 0.114;
-
-  root.style.setProperty("--paper", paper);
-  root.style.setProperty("--ink", brightness < 100 ? "#20211f" : "#20211f");
-  root.style.setProperty("--muted", "#66675f");
-  root.style.setProperty("--panel", secondary);
-  root.style.setProperty("--line", tertiary);
-  root.style.setProperty("--accent", colors[0].hex);
-
-  // Keep the map markers consistent with the new accent.
-  document.querySelectorAll(".point-dot").forEach(dot => {
-    dot.style.fill = dominant.length ? colors[0].hex : "#a74635";
-  });
-}
 function updateThemeFromImage(image) {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d", {
@@ -297,6 +242,7 @@ function updateThemeFromImage(image) {
         const k = Math.min(Number(countSelect.value), samples.length);
         currentPalette = kMeans(samples, k, 12);
         const total = currentPalette.reduce((sum, c) => sum + c.count, 0) || 1;
+        updateThemeFromImage(image);
         currentPalette.forEach(c => c.share = c.count / total * 100);
         currentPalette.sort((a, b) => b.count - a.count);
         lastAnalysis = currentPalette;
