@@ -263,3 +263,43 @@ input, textarea, select {
   background: var(--accent);
   color: var(--button-text);
 }
+
+
+/* Fixes: consistent ink token, tidy navigation, and visible keyboard focus. */
+:root { --ink: var(--text); }
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  align-items: center;
+}
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  letter-spacing: -0.04em;
+}
+.site-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px clamp(14px, 2.5vw, 32px);
+}
+.site-header nav a {
+  display: inline-block;
+  padding: 6px 0;
+  line-height: 1.35;
+}
+.map-point { cursor: pointer; }
+.map-point:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+#image-upload:focus-visible + .upload-button,
+.upload-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 760px) {
+  .site-header { align-items: flex-start; }
+  .site-header nav { justify-content: flex-start; }
+}
+@media (max-width: 480px) {
+  .site-header { flex-direction: column; }
+  .site-header nav { gap: 8px 18px; }
+  .wordmark { font-size: 1rem; }
+}
