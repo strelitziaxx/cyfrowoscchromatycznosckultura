@@ -39,6 +39,20 @@
       description: "",
       image: "images/pola.jpg",
       alt: "Pola i trawy"
+    },
+    "rzeszow": {
+      title: "Rzeszów",
+      kicker: "",
+      description: "",
+      image: "images/rzeszow.jpg",
+      alt: "Rzeszów"
+    },
+    "boleslawiec": {
+      title: "Bolesławiec",
+      kicker: "",
+      description: "",
+      image: "images/boleslawiec.jpg",
+      alt: "Bolesławiec"
     }
   };
 
