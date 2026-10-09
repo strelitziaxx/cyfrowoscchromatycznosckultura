@@ -348,3 +348,45 @@ input, textarea { border-color: var(--line); }
 .button-dark:not(:disabled):hover { background: var(--link); color: var(--button-text); border-color: var(--link); }
 ::selection { background: var(--accent); color: var(--button-text); }
 .palette-item .swatch, .color-choice { border-color: var(--line); }
+
+
+/* === MAP LABEL LEGIBILITY === */
+
+.poland-map .point-label {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.1px;
+
+  /* Use the current theme's text and background colors */
+  fill: var(--text, #252525);
+  stroke: var(--paper, #ffffff);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+
+  /* Keep labels readable and prevent them intercepting clicks */
+  pointer-events: none;
+  user-select: none;
+}
+
+.poland-map .map-point {
+  cursor: pointer;
+}
+
+.poland-map .map-point:focus-visible {
+  outline: none;
+}
+
+.poland-map .map-point:focus-visible .point-halo {
+  stroke: var(--text, #252525);
+  stroke-width: 2px;
+}
+
+/* Slightly smaller labels on narrow screens */
+@media (max-width: 480px) {
+  .poland-map .point-label {
+    font-size: 9px;
+    stroke-width: 3px;
+  }
+}
