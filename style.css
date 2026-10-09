@@ -303,3 +303,48 @@ input, textarea, select {
   .site-header nav { gap: 8px 18px; }
   .wordmark { font-size: 1rem; }
 }
+
+
+/* Stronger image-responsive palette: use the sampled colors across more UI surfaces. */
+:root {
+  --map-bg: var(--panel);
+  --soft-accent: var(--panel);
+}
+body, .site-header, .site-footer, .section-wrap, .intro,
+.place-card, .upload-panel, .results-panel, .maker,
+.map-panel, .creative-canvas, .math-note, .image-preview,
+.palette-empty, .empty-state {
+  background-color: var(--paper);
+  color: var(--text);
+  border-color: var(--line);
+}
+.map-panel, .math-note, .creative-canvas, .image-preview,
+.palette-empty, .empty-state, .proportion-bar {
+  background-color: var(--panel);
+}
+.site-header, .site-footer, .section-wrap, .upload-panel,
+.results-panel, .maker, .place-hint, .controls, .maker-tools {
+  border-color: var(--line);
+}
+.intro-copy, .text-link, .section-note, .place-card > p:not(.eyebrow),
+.microcopy, .status, .math-note p:last-child, .idea-copy,
+nav a, .color-meta, .maker-placeholder, .map-caption, .canvas-caption {
+  color: var(--muted);
+}
+a, nav a:hover, nav a:focus-visible, .text-link:hover,
+.wordmark span, .upload-mark, .button-dark:not(:disabled):hover {
+  color: var(--link);
+}
+.map-point text { fill: var(--text); }
+.point-halo { fill: var(--accent); }
+.point-dot { fill: var(--accent); stroke: var(--paper); }
+.upload-button, .button, .copy-color, .text-button, select,
+input, textarea { border-color: var(--line); }
+.upload-button:hover, .button-outline:not(:disabled):hover {
+  background: var(--accent);
+  color: var(--button-text);
+}
+.button-dark { background: var(--button-bg); color: var(--button-text); border-color: var(--button-bg); }
+.button-dark:not(:disabled):hover { background: var(--link); color: var(--button-text); border-color: var(--link); }
+::selection { background: var(--accent); color: var(--button-text); }
+.palette-item .swatch, .color-choice { border-color: var(--line); }
