@@ -18,7 +18,7 @@
       title: "Bolesławiec",
       kicker: "CERAMIKA LUDOWA",
       description: "Miejsce znane z charakterystycznej ceramiki. Jej wzory, które spotkałam w sklepach nawet poza Polską, to moja inspiracja dla badania koloru."
-      image: "images/krakow-folk.jpg"
+      image: "images/boleslawiec-folk.jpg"
     }
   };
   const mapPoints = [...document.querySelectorAll(".map-point")];
