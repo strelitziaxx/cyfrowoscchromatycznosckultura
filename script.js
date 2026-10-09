@@ -7,8 +7,8 @@
   const places = {
     "krakow-golebie": {
       title: "Kraków: gołębie",
-      kicker: "",
-      description: "",
+      kicker: "SZCZURY NIEBA? NIE...",
+      description: "Gołębie Krakowskie to stworzenia bliskie mojego serca. Nawet gdy dla niektórych wydawają się proste i zwyczajne, znajduje piękno w rojach ciemnych, szaro-niebieskich piór.",
       image: "images/krakow-golebie.jpg",
       alt: "Gołębie w Krakowie"
     },
