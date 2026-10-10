@@ -37,7 +37,7 @@
       title: "Moja Polska",
       kicker: "KORZENIE",
       description: "Oto moja polska. Zaczyna się z rodziną, tutaj zgromadzona na moim chcie w kościele, w ktróym brali ślub moi rodzice w Krakowie.",
-      image: "images/rodzina.jpg",
+      image: "images/rodzina.jpeg",
       alt: "Moja Rodzina"
     },
     
@@ -45,7 +45,7 @@
       title: "Rzeszów",
       kicker: "MIASTO · PODKARPACIE",
       description: "Rzeszów, stolica Podkarpacia; to skąd mój tata. Kwiaty wszędzie.",
-      image: "images/rzeszow.jpg",
+      image: "images/rzeszow.jpeg",
       alt: "Rzeszów — miejsce na mapie inspiracji"
     },
     "boleslawiec": {
