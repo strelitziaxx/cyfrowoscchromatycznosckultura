@@ -21,8 +21,8 @@
     },
     "warszawa-syrenka": {
       title: "Warszawa: Syrenka Warszawska",
-      kicker: "",
-      description: "",
+      kicker: "POLSKA SYRENKA",
+      description: "Syrenka Warzawska, symbol stolicy.",
       image: "images/warszawa-syrenka.jpg",
       alt: "Syrenka Warszawska"
     },
@@ -33,18 +33,18 @@
       image: "images/oscypek-tatry.jpg",
       alt: "Oscypek z południa Polski"
     },
-    "pola": {
-      title: "Pola",
-      kicker: "",
-      description: "",
-      image: "images/pola.jpg",
-      alt: "Pola i trawy"
+    "mojapolska": {
+      title: "Moja Polska",
+      kicker: "KORZENIE",
+      description: "Oto moja polska. Zaczyna się z rodziną, tutaj zgromadzona na moim chcie w kościele, w ktróym brali ślub moi rodzice w Krakowie.",
+      image: "images/rodzina.jpg",
+      alt: "Moja Rodzina"
     },
     
     "rzeszow": {
       title: "Rzeszów",
       kicker: "MIASTO · PODKARPACIE",
-      description: "Rzeszów, stolica Podkarpacia; to skąd mój tata.",
+      description: "Rzeszów, stolica Podkarpacia; to skąd mój tata. Kwiaty wszędzie.",
       image: "images/rzeszow.jpg",
       alt: "Rzeszów — miejsce na mapie inspiracji"
     },
@@ -474,5 +474,5 @@
   });
 
   // Start with a working default place; image paths are relative to the repository root.
-  selectPlace("");
+  selectPlace("mojapolska");
 })();
