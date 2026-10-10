@@ -18,4 +18,4 @@ Obraz jest zmniejszany do maksymalnego wymiaru 180 px, następnie program pobier
 
 ## Jak Zobaczyć
 
-Proszę wejść na stronę internetową [https://strelitziaxx.github.io/kolorymojejpolski/](url).
+Proszę wejść na stronę internetową [https://strelitziaxx.github.io/kolorymojejpolski/].
