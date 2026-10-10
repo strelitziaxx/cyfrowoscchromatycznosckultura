@@ -28,8 +28,8 @@
     },
     "tatry-oscypek": {
       title: "Tatry: oscypek",
-      kicker: "",
-      description: "",
+      kicker: "MNIAM MNIAM",
+      description: "Oscypek z grilla z żurawiną. Pachnie jak Krupówki i każdy ludowy festiwal w Krakowie. Ma niepowtarzalny kolor, kształt i smak. Nigdy nie sądziłam, że tak będzie mi smakował.",
       image: "images/oscypek-tatry.jpg",
       alt: "Oscypek z południa Polski"
     },
