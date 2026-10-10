@@ -15,7 +15,7 @@
     "krakow-kocie-lby": {
       title: "Kraków: kocie łby",
       kicker: "KAMIENIE, KTÓRE PRZEŻYŁY WIEKI",
-      description: "Właściwie, to zdjęcie to ulica Lublina, ale kolory oraz ujęcie przypominają mi dokładnej atmosfery dróg średniowiecznych miast, tak jak w Krakowie; te kamienie noszą historie pokoleń, i ich zmęczone, lśniące łby, tutaj widoczne, również służyły moich przodków."
+      description: "Właściwie, to zdjęcie to ulica Lublina, ale kolory oraz ujęcie przypominają mi dokładnej atmosfery dróg średniowiecznych miast, tak jak w Krakowie; te kamienie noszą historie pokoleń, i ich zmęczone, lśniące łby, tutaj widoczne, również służyły moich przodków.",
       image: "images/krakow-kocie-lby.jpg",
       alt: "Kocie łby — brukowana droga w Krakowie"
     },
