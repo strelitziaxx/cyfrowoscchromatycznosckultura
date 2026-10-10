@@ -16,6 +16,6 @@ Myszką można wybrać punkty na uproszczonej mapie schematycznej, a program pok
 
 Obraz jest zmniejszany do maksymalnego wymiaru 180 px, następnie program pobiera próbki pikseli. Każdy piksel jest reprezentowany przez trzy liczby RGB. Algorytm k-means grupuje próbki w wybraną liczbę klastrów; środek klastra służy jako kolor reprezentatywny. Procent oznacza udział próbek przypisanych do danego klastra, a nie dokładny udział powierzchni obiektu na oryginalnym zdjęciu.
 
-## Jak Zobaczyc
+## Jak Zobaczyć
 
-Jak access strona internetowa
+Proszę wejść na stronę internetową [https://strelitziaxx.github.io/kolorymojejpolski/](url).
